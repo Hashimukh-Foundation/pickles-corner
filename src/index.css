@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    /* Fixed: strictly black background and white text */
+    @apply bg-black text-white;
+    font-family: 'DM Sans', sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+  }
+  /* Bangla mode: switch body and headings to Hind Siliguri */
+  [lang="bn"] body,
+  .lang-bn body {
+    font-family: 'Hind Siliguri', sans-serif;
+  }
+  [lang="bn"] h1, [lang="bn"] h2, [lang="bn"] h3,
+  [lang="bn"] h4, [lang="bn"] h5, [lang="bn"] h6,
+  .lang-bn h1, .lang-bn h2, .lang-bn h3,
+  .lang-bn h4, .lang-bn h5, .lang-bn h6 {
+    font-family: 'Hind Siliguri', sans-serif;
+  }
+}
+
+@layer components {
+  /* Updated for the Pickles Corner Dark Aesthetic */
+  .btn-primary {
+    @apply bg-[#1F8B4D] hover:bg-[#166E3B] text-white font-bold py-3 px-6 transition-all border border-transparent hover:border-green-400 uppercase tracking-widest text-[10px] inline-flex items-center justify-center gap-2;
+  }
+  .btn-secondary {
+    @apply bg-transparent hover:bg-white/5 text-white border border-[#333] hover:border-white font-bold py-3 px-6 transition-all uppercase tracking-widest text-[10px] inline-flex items-center justify-center gap-2;
+  }
+  .btn-danger {
+    @apply bg-[#C62020]/10 hover:bg-[#C62020] text-[#C62020] hover:text-white border border-[#C62020]/30 hover:border-[#C62020] font-bold py-3 px-6 transition-all uppercase tracking-widest text-[10px] inline-flex items-center justify-center gap-2;
+  }
+  .card {
+    @apply bg-[#191715] border border-[#333] overflow-hidden;
+  }
+  .input {
+    @apply w-full bg-[#111] border border-[#333] text-white px-4 py-3 text-sm focus:outline-none focus:border-[#1F8B4D] transition-colors placeholder-gray-600;
+  }
+  .label {
+    @apply block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 border text-[9px] font-bold uppercase tracking-widest;
+  }
+  /* Bangla text utility class */
+  .font-bn {
+    font-family: 'Hind Siliguri', sans-serif;
+  }
+  /* Bangla input styling */
+  .input-bn {
+    @apply w-full bg-[#111] border border-[#333] text-white px-4 py-3 text-sm focus:outline-none focus:border-[#1F8B4D] transition-colors placeholder-gray-600;
+    font-family: 'Hind Siliguri', sans-serif;
+  }
+}
