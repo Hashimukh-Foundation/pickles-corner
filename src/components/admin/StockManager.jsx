@@ -32,7 +32,7 @@ export default function StockManager({ product, onClose }) {
           if (error) throw error
         }
       }
-      toast.success('Stock updated!')
+      toast.success('Inventory updated successfully')
       onClose(true)
     } catch (err) {
       toast.error(err.message)
@@ -42,59 +42,118 @@ export default function StockManager({ product, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-[#191715] border border-[#333] w-full max-w-md shadow-2xl">
+        
+        {/* Header */}
+        <div className="flex items-start justify-between px-8 py-6 border-b border-[#333] bg-[#111]">
           <div>
-            <h2 className="font-display text-lg font-bold text-navy-900">Manage Stock</h2>
-            <p className="text-xs text-gray-400">{product.name}</p>
+            <h2 className="font-bangla-sans text-xl font-bold text-white uppercase tracking-wide">
+              Inventory Adjustment
+            </h2>
+            <p className="text-[10px] text-[#1F8B4D] font-mono uppercase tracking-widest mt-1">
+              {product.name}
+            </p>
           </div>
-          <button onClick={() => onClose(false)} className="text-gray-400 hover:text-gray-700">
-            <X size={20} />
+          <button 
+            onClick={() => onClose(false)} 
+            className="text-gray-500 hover:text-[#C62020] transition-colors p-1"
+          >
+            <X size={20} strokeWidth={2.5} />
           </button>
         </div>
 
-        <div className="px-6 py-4 space-y-3">
+        {/* Body */}
+        <div className="px-8 py-6 space-y-4 max-h-[60vh] overflow-y-auto">
           {sizes.map(size => {
             const adj = adjustments[size.id] || 0
             const preview = Math.max(0, size.stock_quantity + adj)
+            
             return (
-              <div key={size.id} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+              <div key={size.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border border-[#333] bg-[#111]">
+                
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-navy-900">{size.size_grams}g
-                    {size.sku && <span className="ml-2 text-xs text-gray-400">{size.sku}</span>}
+                  <p className="text-sm font-bold text-white uppercase tracking-wide font-bangla-sans flex items-center gap-2">
+                    {size.size_grams}G
+                    {size.sku && <span className="text-[9px] bg-black border border-[#333] px-1.5 py-0.5 text-gray-500 font-mono">{size.sku}</span>}
                   </p>
-                  <p className="text-xs text-gray-500">
-                    Current: <span className={size.stock_quantity <= 10 ? 'text-red-500 font-bold' : 'font-semibold'}>{size.stock_quantity}</span>
-                    {adj !== 0 && <span className={`ml-2 ${adj > 0 ? 'text-green-600' : 'text-red-500'}`}>→ {preview}</span>}
-                  </p>
+                  
+                  <div className="text-[10px] text-gray-500 uppercase tracking-widest mt-1.5 font-mono flex items-center gap-2">
+                    <span>On Hand: <span className={size.stock_quantity <= 10 ? 'text-[#C62020] font-bold' : 'text-white'}>{size.stock_quantity}</span></span>
+                    
+                    {adj !== 0 && (
+                      <span className="flex items-center gap-2">
+                        <span>→</span>
+                        <span className={`px-1.5 py-0.5 font-bold ${adj > 0 ? 'bg-[#1F8B4D]/10 text-[#1F8B4D]' : 'bg-[#C62020]/10 text-[#C62020]'}`}>
+                          FINAL: {preview}
+                        </span>
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <button onClick={() => adjust(size.id, -1)} className="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center hover:bg-red-50 hover:border-red-200 transition">
-                    <Minus size={12} />
+
+                {/* Controls */}
+                <div className="flex items-center gap-1.5">
+                  <button 
+                    onClick={() => adjust(size.id, -1)} 
+                    className="w-8 h-8 bg-black border border-[#333] flex items-center justify-center text-gray-400 hover:text-[#C62020] hover:border-[#C62020]/50 transition-colors"
+                  >
+                    <Minus size={14} strokeWidth={3} />
                   </button>
                   <input
                     type="number"
-                    className="w-16 text-center border border-gray-200 rounded-lg py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400"
+                    className="w-14 bg-black border border-[#333] text-white text-center py-1.5 text-xs font-mono focus:outline-none focus:border-[#1F8B4D] transition-colors"
                     value={adj}
                     onChange={e => setDirect(size.id, e.target.value)}
                   />
-                  <button onClick={() => adjust(size.id, 1)} className="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center hover:bg-green-50 hover:border-green-200 transition">
-                    <Plus size={12} />
+                  <button 
+                    onClick={() => adjust(size.id, 1)} 
+                    className="w-8 h-8 bg-black border border-[#333] flex items-center justify-center text-gray-400 hover:text-[#1F8B4D] hover:border-[#1F8B4D]/50 transition-colors"
+                  >
+                    <Plus size={14} strokeWidth={3} />
                   </button>
                 </div>
+
               </div>
             )
           })}
-          {sizes.length === 0 && <p className="text-sm text-gray-400 text-center py-4">No sizes found for this product.</p>}
+          
+          {sizes.length === 0 && (
+            <div className="text-center py-8 border border-[#333] bg-[#111]">
+              <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+                No size variants found for this product.
+              </p>
+            </div>
+          )}
         </div>
 
-        <div className="flex justify-end gap-3 px-6 pb-5">
-          <button onClick={() => onClose(false)} className="btn-secondary">Cancel</button>
-          <button onClick={handleSave} disabled={loading} className="btn-primary">
-            {loading ? 'Saving…' : 'Save Stock'}
+        {/* Footer Actions */}
+        <div className="flex justify-end gap-4 px-8 py-6 border-t border-[#333] bg-[#111]">
+          <button 
+            onClick={() => onClose(false)} 
+            className="bg-transparent text-gray-400 font-bold py-3 px-6 transition-all border border-[#333] hover:border-white hover:text-white uppercase tracking-widest text-[10px]"
+          >
+            Cancel
+          </button>
+          <button 
+            onClick={handleSave} 
+            disabled={loading} 
+            className="bg-[#1F8B4D] hover:bg-[#166E3B] text-white font-bold py-3 px-8 transition-all border border-transparent hover:border-green-400 uppercase tracking-widest text-[10px] flex items-center gap-2"
+          >
+            {loading ? (
+              <>
+                <svg className="animate-spin h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Committing...
+              </>
+            ) : (
+              'Save Changes'
+            )}
           </button>
         </div>
+        
       </div>
     </div>
   )

@@ -6,19 +6,12 @@ import toast from 'react-hot-toast'
 const STATUSES = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled']
 
 const STATUS_META = {
-  pending:    { label: 'Pending',    color: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
-  confirmed:  { label: 'Confirmed',  color: 'bg-blue-100 text-blue-700 border-blue-200' },
-  processing: { label: 'Processing', color: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
-  shipped:    { label: 'Shipped',    color: 'bg-purple-100 text-purple-700 border-purple-200' },
-  delivered:  { label: 'Delivered',  color: 'bg-green-100 text-green-700 border-green-200' },
-  cancelled:  { label: 'Cancelled',  color: 'bg-red-100 text-red-700 border-red-200' },
-}
-
-function StatusBadge({ status }) {
-  const meta = STATUS_META[status] ?? STATUS_META.pending
-  return (
-    <span className={`badge border text-xs px-2.5 py-1 ${meta.color}`}>{meta.label}</span>
-  )
+  pending:    { label: 'Pending',    color: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30' },
+  confirmed:  { label: 'Confirmed',  color: 'bg-blue-500/10 text-blue-500 border-blue-500/30' },
+  processing: { label: 'Processing', color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' },
+  shipped:    { label: 'Shipped',    color: 'bg-purple-500/10 text-purple-400 border-purple-500/30' },
+  delivered:  { label: 'Delivered',  color: 'bg-[#1F8B4D]/10 text-[#1F8B4D] border-[#1F8B4D]/30' },
+  cancelled:  { label: 'Cancelled',  color: 'bg-[#C62020]/10 text-[#C62020] border-[#C62020]/30' },
 }
 
 function StatusSelect({ value, onChange, loading }) {
@@ -27,11 +20,12 @@ function StatusSelect({ value, onChange, loading }) {
       value={value}
       onChange={e => onChange(e.target.value)}
       disabled={loading}
-      className="input text-sm py-1.5 cursor-pointer"
+      className={`bg-black border text-[9px] font-bold uppercase tracking-widest px-2 py-1.5 focus:outline-none transition-colors cursor-pointer disabled:opacity-50
+        ${STATUS_META[value]?.color || 'text-white border-[#333]'}`}
       onClick={e => e.stopPropagation()}
     >
       {STATUSES.map(s => (
-        <option key={s} value={s}>{STATUS_META[s].label}</option>
+        <option key={s} value={s} className="bg-black text-white">{STATUS_META[s].label}</option>
       ))}
     </select>
   )
@@ -59,10 +53,9 @@ function OrderRow({ order, onStatusChange }) {
   }
 
   const handleStatusChange = async (newStatus) => {
-    // Warn before cancelling — stock will be restored
     if (newStatus === 'cancelled' && order.status !== 'cancelled') {
       const confirmed = window.confirm(
-        `Cancel order ${order.order_number}?\n\nThis will automatically restore stock for all items in this order.`
+        `Are you sure you want to cancel order #${order.order_number}?\n\nThis will automatically restore stock for all items in this order.`
       )
       if (!confirmed) return
     }
@@ -73,11 +66,11 @@ function OrderRow({ order, onStatusChange }) {
       toast.error(error.message)
     } else {
       if (newStatus === 'cancelled') {
-        toast.success('Order cancelled — stock has been restored', { icon: '↩️' })
+        toast.success('Order cancelled. Stock restored.', { icon: '↩️' })
       } else if (newStatus === 'delivered') {
-        toast.success('Marked as delivered', { icon: '✅' })
+        toast.success('Marked as delivered.', { icon: '✅' })
       } else {
-        toast.success('Status updated')
+        toast.success('Status updated.')
       }
       onStatusChange(order.id, newStatus)
     }
@@ -90,116 +83,144 @@ function OrderRow({ order, onStatusChange }) {
     else { toast.success('Note saved'); setEditNote(false) }
   }
 
-  const fmt = (n) => '৳' + parseFloat(n).toFixed(2)
+  const fmt = (n) => '৳' + parseFloat(n).toFixed(0)
 
   return (
-    <div className="card mb-3 overflow-hidden">
+    <div className="bg-[#111] border border-[#333] mb-4 overflow-hidden transition-colors duration-300">
+      
       {/* Row summary */}
       <div
-        className="flex flex-wrap items-center gap-3 px-5 py-3.5 cursor-pointer hover:bg-gray-50/60 transition-colors"
+        className="flex flex-wrap md:flex-nowrap items-center gap-4 px-6 py-4 cursor-pointer hover:bg-[#191715] transition-colors"
         onClick={handleExpand}
       >
-        <div className="flex-shrink-0">
-          {expanded ? <ChevronUp size={16} className="text-gray-400" /> : <ChevronDown size={16} className="text-gray-400" />}
+        <div className="flex-shrink-0 text-gray-500">
+          {expanded ? <ChevronUp size={16} strokeWidth={2.5} /> : <ChevronDown size={16} strokeWidth={2.5} />}
         </div>
 
-        <div className="min-w-0">
-          <span className="font-bold text-navy-900 font-mono text-sm">{order.order_number}</span>
+        <div className="w-24 flex-shrink-0">
+          <span className="font-bold text-white font-mono text-sm tracking-wider">#{order.order_number}</span>
         </div>
 
-        <div className="flex-1 min-w-0">
-          <p className="font-semibold text-navy-900 text-sm truncate">{order.customer_name}</p>
-          <p className="text-xs text-gray-400 flex items-center gap-1"><Phone size={10} />{order.customer_phone}</p>
+        <div className="flex-1 min-w-[200px]">
+          <p className="font-bold text-white uppercase tracking-wide text-xs truncate font-bangla-sans">{order.customer_name}</p>
+          <p className="text-[10px] text-gray-500 flex items-center gap-1.5 mt-1 font-mono uppercase tracking-widest"><Phone size={10} />{order.customer_phone}</p>
         </div>
 
-        <div className="hidden sm:block text-xs text-gray-400 min-w-[120px]">
-          {new Date(order.created_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+        <div className="hidden md:block text-[9px] text-gray-500 font-mono uppercase tracking-widest w-32 flex-shrink-0 text-center">
+          {new Date(order.created_at).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}
+          <br />
+          {new Date(order.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
         </div>
 
-        <div className="font-bold text-brand-700 text-sm min-w-[80px] text-right">
+        <div className="font-bold text-[#1F8B4D] font-mono text-sm w-20 flex-shrink-0 text-right">
           {fmt(order.total_amount)}
         </div>
 
-        <div onClick={e => e.stopPropagation()} className="min-w-[130px]">
+        <div onClick={e => e.stopPropagation()} className="w-32 flex-shrink-0 ml-auto md:ml-0 flex justify-end">
           <StatusSelect value={order.status} onChange={handleStatusChange} loading={updatingStatus} />
         </div>
       </div>
 
       {/* Expanded details */}
       {expanded && (
-        <div className="border-t border-gray-100 px-5 py-4 bg-gray-50/40">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-            {/* Delivery */}
-            <div className="sm:col-span-2">
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5 flex items-center gap-1">
-                <MapPin size={11} /> Delivery Details
+        <div className="border-t border-[#333] bg-black px-6 py-6 space-y-6">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            {/* Delivery Details */}
+            <div className="lg:col-span-2 bg-[#111] border border-[#333] p-5">
+              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2 border-b border-[#333] pb-2">
+                <MapPin size={12} className="text-[#1F8B4D]" /> Delivery Destination
               </p>
-              <p className="text-sm text-gray-700">{order.customer_address}</p>
-              {order.customer_city && <p className="text-sm text-gray-500">{order.customer_city}</p>}
+              <p className="text-xs text-white font-bangla-sans leading-relaxed">{order.customer_address}</p>
+              {order.customer_city && <p className="text-[10px] text-gray-400 font-mono mt-1 uppercase tracking-widest">{order.customer_city}</p>}
               {order.delivery_note && (
-                <p className="text-xs text-gray-400 italic mt-1">Note: "{order.delivery_note}"</p>
+                <p className="text-[10px] text-gray-500 italic mt-3 border-l-2 border-[#333] pl-2 font-bangla-serif">
+                  Note: "{order.delivery_note}"
+                </p>
               )}
             </div>
 
-            {/* Totals */}
-            <div>
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Summary</p>
-              <div className="text-sm space-y-0.5">
-                <div className="flex justify-between text-gray-600"><span>Subtotal</span><span>{fmt(order.subtotal)}</span></div>
-                <div className="flex justify-between text-gray-600"><span>Delivery</span><span>{fmt(order.delivery_charge)}</span></div>
-                <div className="flex justify-between font-bold text-navy-900 border-t border-gray-200 pt-0.5 mt-0.5"><span>Total</span><span>{fmt(order.total_amount)}</span></div>
-                <div className="flex justify-between text-xs text-gray-400 mt-1">
-                  <span>Payment</span>
-                  <span className="capitalize">{order.payment_method} · {order.payment_status}</span>
+            {/* Financial Summary */}
+            <div className="bg-[#111] border border-[#333] p-5">
+              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 border-b border-[#333] pb-2">
+                Financial Summary
+              </p>
+              <div className="text-[10px] uppercase tracking-widest font-bold space-y-2">
+                <div className="flex justify-between text-gray-500"><span>Subtotal</span><span className="font-mono">{fmt(order.subtotal)}</span></div>
+                <div className="flex justify-between text-gray-500"><span>Delivery</span><span className="font-mono">{fmt(order.delivery_charge)}</span></div>
+                <div className="flex justify-between text-white border-t border-[#333] pt-2 mt-2"><span>Total</span><span className="text-[#1F8B4D] font-mono">{fmt(order.total_amount)}</span></div>
+                <div className="flex justify-between text-[9px] text-gray-600 mt-3 pt-2">
+                  <span>Payment Method</span>
+                  <span className="font-mono text-[#C62020]">{order.payment_method} / {order.payment_status}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Order items */}
-          <div className="mb-4">
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-1">
-              <Package size={11} /> Items
-            </p>
+          {/* Order Items */}
+          <div className="bg-[#111] border border-[#333]">
+            <div className="px-5 py-3 border-b border-[#333] flex items-center gap-2 bg-black">
+              <Package size={14} className="text-[#1F8B4D]" />
+              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                Manifest
+              </p>
+            </div>
+            
             {loadingItems ? (
-              <p className="text-xs text-gray-400">Loading…</p>
+              <div className="px-5 py-6 flex items-center gap-2 text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+                <svg className="animate-spin h-3 w-3 text-[#1F8B4D]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                Retrieving items...
+              </div>
             ) : (
-              <div className="space-y-1.5">
+              <div className="divide-y divide-[#333]">
                 {items.map(item => (
-                  <div key={item.id} className="flex justify-between items-center text-sm bg-white rounded-lg px-3 py-2 border border-gray-100">
-                    <span className="text-gray-700 font-medium">{item.product_name}</span>
-                    <span className="text-gray-400 text-xs">{item.size_grams}g × {item.quantity}</span>
-                    <span className="font-semibold text-brand-700">{fmt(item.subtotal)}</span>
+                  <div key={item.id} className="flex justify-between items-center text-xs px-5 py-3 hover:bg-[#191715] transition-colors">
+                    <div className="flex-1 min-w-0 pr-4">
+                      <span className="text-white font-bold uppercase tracking-wide truncate block font-bangla-sans">{item.product_name}</span>
+                    </div>
+                    <span className="text-gray-500 text-[10px] font-mono uppercase tracking-widest flex-shrink-0 w-24 text-right">{item.size_grams}g × {item.quantity}</span>
+                    <span className="font-bold text-[#1F8B4D] font-mono flex-shrink-0 w-20 text-right">{fmt(item.subtotal)}</span>
                   </div>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Admin note */}
-          <div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Admin Note</p>
-              <button onClick={() => setEditNote(v => !v)} className="text-gray-400 hover:text-brand-600 transition">
-                {editNote ? <X size={12} /> : <Pencil size={12} />}
+          {/* Admin Note */}
+          <div className="bg-[#191715] border border-[#333] p-5">
+            <div className="flex items-center gap-3 mb-2">
+              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Internal Operator Note</p>
+              <button 
+                onClick={() => setEditNote(v => !v)} 
+                className={`flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest transition-colors px-2 py-0.5 border ${editNote ? 'bg-[#C62020]/10 text-[#C62020] border-[#C62020]/30 hover:bg-[#C62020]/20' : 'bg-[#1F8B4D]/10 text-[#1F8B4D] border-[#1F8B4D]/30 hover:bg-[#1F8B4D]/20'}`}
+              >
+                {editNote ? <><X size={10} /> Cancel</> : <><Pencil size={10} /> Edit</>}
               </button>
             </div>
+            
             {editNote ? (
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-3 mt-3">
                 <input
-                  className="input text-sm flex-1"
-                  placeholder="Add a private note…"
+                  className="w-full bg-black border border-[#333] text-white px-3 py-2 text-xs focus:outline-none focus:border-[#1F8B4D] transition-colors font-mono placeholder-gray-600"
+                  placeholder="Enter private operator note..."
                   value={note}
                   onChange={e => setNote(e.target.value)}
                 />
-                <button onClick={saveNote} className="btn-primary py-1.5 px-3 text-xs">Save</button>
+                <button 
+                  onClick={saveNote} 
+                  className="bg-[#1F8B4D] hover:bg-[#166E3B] text-white font-bold px-6 py-2 transition-all border border-transparent hover:border-green-400 uppercase tracking-widest text-[9px] whitespace-nowrap"
+                >
+                  Save Note
+                </button>
               </div>
             ) : (
-              <p className="text-sm text-gray-500 italic">
-                {order.admin_note || <span className="text-gray-300">No note</span>}
+              <p className={`text-xs mt-1 ${order.admin_note ? 'text-gray-300 font-mono' : 'text-gray-600 italic uppercase tracking-widest font-bold text-[9px]'}`}>
+                {order.admin_note || 'No notes attached to this record.'}
               </p>
             )}
           </div>
+
         </div>
       )}
     </div>
@@ -237,67 +258,79 @@ export default function AdminOrders() {
     )
   })
 
-  // Count per status
   const counts = orders.reduce((acc, o) => {
     acc[o.status] = (acc[o.status] || 0) + 1
     return acc
   }, {})
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
+      
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-navy-900">Orders</h1>
-          <p className="text-gray-500 text-sm mt-0.5">{orders.length} total orders</p>
+      <div className="mb-8 border-b border-[#333] pb-6">
+        <h1 className="font-bangla-sans text-2xl md:text-3xl font-bold text-white uppercase tracking-wide">
+          Order Management
+        </h1>
+        <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-1 font-mono">
+          {orders.length} {orders.length === 1 ? 'Record Found' : 'Records Found'}
+        </p>
+      </div>
+
+      {/* Filters & Search */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
+        
+        {/* Status Filter Tabs */}
+        <div className="flex bg-[#111] border border-[#333] w-fit overflow-x-auto overflow-y-hidden scrollbar-hide">
+          {['all', ...STATUSES].map(s => (
+            <button
+              key={s}
+              onClick={() => setFilter(s)}
+              className={`flex items-center gap-2 px-4 py-3 text-[10px] font-bold uppercase tracking-widest transition-colors whitespace-nowrap border-r border-[#333] last:border-r-0 ${
+                filter === s
+                  ? 'bg-[#1F8B4D] text-white'
+                  : 'text-gray-500 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              {s === 'all' ? 'All Records' : STATUS_META[s].label}
+              {s !== 'all' && counts[s] ? (
+                <span className={`px-1.5 py-0.5 font-mono text-[9px] ${filter === s ? 'bg-black/30' : 'bg-[#333]'}`}>
+                  {counts[s]}
+                </span>
+              ) : null}
+            </button>
+          ))}
         </div>
+
+        {/* Search */}
+        <div className="relative w-full lg:w-72 flex-shrink-0">
+          <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" />
+          <input
+            className="w-full bg-[#111] border border-[#333] text-white pl-10 pr-4 py-3 text-[10px] font-bold uppercase tracking-widest focus:outline-none focus:border-[#1F8B4D] transition-colors placeholder-gray-600"
+            placeholder="Search ID, Name, Phone..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
+
       </div>
 
-      {/* Status filter tabs */}
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl mb-5 overflow-x-auto">
-        {['all', ...STATUSES].map(s => (
-          <button
-            key={s}
-            onClick={() => setFilter(s)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize whitespace-nowrap transition-all ${
-              filter === s
-                ? 'bg-white shadow text-navy-900'
-                : 'text-gray-500 hover:text-navy-900'
-            }`}
-          >
-            {s === 'all' ? 'All' : STATUS_META[s].label}
-            {s !== 'all' && counts[s] ? (
-              <span className="ml-1.5 text-[10px] bg-gray-200 rounded-full px-1.5 py-0.5">
-                {counts[s]}
-              </span>
-            ) : null}
-          </button>
-        ))}
-      </div>
-
-      {/* Search */}
-      <div className="relative mb-5 max-w-xs">
-        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-        <input
-          className="input pl-9"
-          placeholder="Search by name, phone, order #…"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-      </div>
-
-      {/* Orders */}
+      {/* Orders List */}
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="w-8 h-8 border-4 border-brand-400 border-t-transparent rounded-full animate-spin" />
+        <div className="flex justify-center py-32">
+          <svg className="animate-spin h-8 w-8 text-[#1F8B4D]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="card p-12 text-center text-gray-400 text-sm">
-          <Clock size={32} className="mx-auto mb-2 text-gray-200" />
-          No orders found.
+        <div className="bg-[#191715] border border-[#333] p-16 text-center">
+          <Clock size={32} className="mx-auto text-gray-600 mb-4" strokeWidth={1} />
+          <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+            No matching records found.
+          </p>
         </div>
       ) : (
-        <div>
+        <div className="space-y-1">
           {filtered.map(order => (
             <OrderRow key={order.id} order={order} onStatusChange={handleStatusChange} />
           ))}
