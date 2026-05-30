@@ -1,4 +1,4 @@
-# NutriStore — E-commerce App (React + Supabase)
+# Pickles Corner — E-commerce App (React + Supabase)
 
 A full-featured e-commerce web app for selling products (with multiple sizes in grams), managing blogs, and moderating customer reviews.
 
