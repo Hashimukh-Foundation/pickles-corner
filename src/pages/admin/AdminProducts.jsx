@@ -106,7 +106,7 @@ export default function AdminProducts() {
                     <div className="flex items-center gap-4">
                       {p.image_url ? (
                         <div className="w-10 h-10 bg-black border border-[#333] overflow-hidden flex-shrink-0">
-                          <img src={p.image_url} alt={p.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                          <img src={p.image_url} alt={p.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" onError={e => { e.currentTarget.style.display='none' }} />
                         </div>
                       ) : (
                         <div className="w-10 h-10 bg-black border border-[#333] flex items-center justify-center text-gray-700 font-bold text-sm uppercase font-bangla-sans flex-shrink-0">

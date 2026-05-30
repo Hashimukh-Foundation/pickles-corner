@@ -250,7 +250,7 @@ export default function Checkout() {
                       
                       <div className="w-14 h-14 bg-black overflow-hidden flex-shrink-0 border border-[#333]">
                         {item.imageUrl ? (
-                          <img src={item.imageUrl} alt="" className="w-full h-full object-cover opacity-80" />
+                          <img src={item.imageUrl} alt="" className="w-full h-full object-cover opacity-80" onError={e => { e.currentTarget.style.display='none' }} />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-gray-600 font-bold text-sm uppercase font-bangla-sans">
                             {item.productName[0]}

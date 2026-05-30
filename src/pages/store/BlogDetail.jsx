@@ -97,7 +97,7 @@ export default function BlogDetail() {
                 src={blog.cover_image_url} 
                 alt={title} 
                 className="w-full h-full object-cover opacity-90" 
-              />
+              onError={e => e.currentTarget.style.display='none'} />
             </div>
           </div>
         )}

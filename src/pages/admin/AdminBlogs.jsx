@@ -71,7 +71,7 @@ export default function AdminBlogs() {
               {/* Cover Image */}
               <div className="w-full md:w-20 h-32 md:h-20 bg-black border border-[#333] flex-shrink-0 overflow-hidden relative">
                 {blog.cover_image_url ? (
-                  <img src={blog.cover_image_url} alt={blog.title} className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" />
+                  <img src={blog.cover_image_url} alt={blog.title} className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" onError={e => { e.currentTarget.parentElement.style.display='none' }} />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-[#333]">
                     <BookOpen size={24} strokeWidth={1} />

@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { LayoutDashboard, Package, BookOpen, Star, LogOut, ShoppingCart, Menu, X } from 'lucide-react'
+import { LayoutDashboard, Package, BookOpen, Star, LogOut, ShoppingCart, Menu, X, LayoutGrid } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const nav = [
   { to: '/admin', icon: LayoutDashboard, label: 'Dashboard', end: true },
   { to: '/admin/orders', icon: ShoppingCart, label: 'Orders' },
   { to: '/admin/products', icon: Package, label: 'Inventory' },
+  { to: '/admin/categories', icon: LayoutGrid, label: 'Categories' },
   { to: '/admin/blogs', icon: BookOpen, label: 'Journal' },
   { to: '/admin/reviews', icon: Star, label: 'Feedback' },
 ]

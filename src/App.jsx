@@ -20,11 +20,13 @@ import AdminProducts from './pages/admin/AdminProducts'
 import AdminBlogs from './pages/admin/AdminBlogs'
 import AdminReviews from './pages/admin/AdminReviews'
 import AdminOrders from './pages/admin/AdminOrders'
+import AdminCategories from './pages/admin/AdminCategories'
 
 // Layout
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import AdminLayout from './components/admin/AdminLayout'
+import ScrollToTop from './components/ScrollToTop'
 
 function ProtectedRoute({ session, children }) {
   if (!session) return <Navigate to="/admin/login" replace />
@@ -57,7 +59,9 @@ export default function App() {
   }
 
   return (
-    <Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
       {/* ── Store ──────────────────────────────────────── */}
       <Route path="/" element={<StoreLayout><Home /></StoreLayout>} />
       <Route path="/products" element={<StoreLayout><ProductsPage /></StoreLayout>} />
@@ -79,11 +83,13 @@ export default function App() {
         <Route index element={<AdminDashboard />} />
         <Route path="orders" element={<AdminOrders />} />
         <Route path="products" element={<AdminProducts />} />
+        <Route path="categories" element={<AdminCategories />} />
         <Route path="blogs" element={<AdminBlogs />} />
         <Route path="reviews" element={<AdminReviews />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+      </Routes>
+    </>
   )
 }

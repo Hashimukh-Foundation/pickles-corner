@@ -157,7 +157,7 @@ export default function ProductDetail() {
                 <img 
                   src={product.image_url} 
                   alt={t(product.name, product.name_bn)} 
-                  className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" 
+                  className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" onError={e => e.currentTarget.style.display='none'} 
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center font-bangla-sans text-8xl font-bold text-gray-700 uppercase">

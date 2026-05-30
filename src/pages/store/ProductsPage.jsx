@@ -57,7 +57,7 @@ function ProductCard({ product }) {
             src={product.image_url} 
             alt={t(product.name, product.name_bn)} 
             className={`object-cover w-full h-full transition-transform duration-500 opacity-90 ${inStock ? 'group-hover:scale-105 group-hover:opacity-100' : 'grayscale'}`} 
-          />
+          onError={e => e.currentTarget.style.display='none'} />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-700 text-4xl uppercase tracking-widest font-bangla-sans">
             {t(product.name, product.name_bn)?.[0]}
